@@ -4,8 +4,6 @@ using Core.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -54,6 +52,11 @@ namespace API.Controllers
             }
             var user = await signInManager.UserManager.GetUserByEmailWithAddress(User);
 
+            if (user == null)
+            {
+                return NotFound(); // Dacă utilizatorul nu poate fi găsit
+            }
+
             return Ok(new
             {
                 user.FirstName,
@@ -62,7 +65,7 @@ namespace API.Controllers
                 Address = user.Address?.ToDto()
             });
         }
-        [HttpGet]
+        [HttpGet("auth-status")]
         public ActionResult GetAuthState()
         {
             return Ok(new { IsAuthenticated = User.Identity?.IsAuthenticated ?? false });
